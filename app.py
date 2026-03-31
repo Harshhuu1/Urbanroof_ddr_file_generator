@@ -31,8 +31,12 @@ def index():
     return render_template("dashboard.html", latest_run=latest_run)
 
 
-@app.post("/generate")
+@app.route("/generate", methods=["GET", "POST"])
 def generate():
+    if request.method == "GET":
+        flash("Use the upload form on the home page to generate a report.", "error")
+        return redirect(url_for("index"))
+
     inspection_file = request.files.get("inspection_pdf")
     thermal_file = request.files.get("thermal_pdf")
     title = (request.form.get("report_title") or "Main DDR (Detailed Diagnostic Report)").strip()

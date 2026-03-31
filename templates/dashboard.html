@@ -20,7 +20,7 @@
         {% endif %}
       {% endwith %}
 
-      <form method="post" action="/generate" enctype="multipart/form-data">
+      <form method="post" action="{{ url_for('generate') }}" enctype="multipart/form-data">
         <label>Inspection PDF</label>
         <input type="file" name="inspection_pdf" accept=".pdf" required>
 
