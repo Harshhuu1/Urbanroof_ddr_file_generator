@@ -20,6 +20,12 @@ app.config["MAX_CONTENT_LENGTH"] = 80 * 1024 * 1024
 
 ALLOWED_SUFFIX = {".pdf"}
 RUNS: dict[str, dict[str, str]] = {}
+ARTIFACT_MAP = {
+    "html": "main_ddr.html",
+    "markdown": "main_ddr.md",
+    "json": "main_ddr.json",
+    "pdf": "main_ddr.pdf",
+}
 
 
 @app.get("/")
@@ -28,6 +34,10 @@ def index():
     if RUNS:
         latest_id = next(reversed(RUNS))
         latest_run = {"id": latest_id, **RUNS[latest_id]}
+    else:
+        latest_id = _latest_run_id_from_disk()
+        if latest_id:
+            latest_run = _build_run_payload_from_disk(latest_id)
     return render_template("dashboard.html", latest_run=latest_run)
 
 
@@ -91,27 +101,22 @@ def generate():
 @app.get("/result/<run_id>")
 def result(run_id: str):
     run = RUNS.get(run_id)
-    if not run:
+    if run:
+        return render_template("dashboard.html", latest_run={"id": run_id, **run})
+    disk_run = _build_run_payload_from_disk(run_id)
+    if not disk_run:
         abort(404)
-    return render_template("dashboard.html", latest_run={"id": run_id, **run})
+    return render_template("dashboard.html", latest_run=disk_run)
 
 
 @app.get("/download/<run_id>/<artifact>")
 def download(run_id: str, artifact: str):
-    run = RUNS.get(run_id)
-    if not run:
+    if artifact not in ARTIFACT_MAP:
         abort(404)
-    if artifact not in {"html", "markdown", "json", "pdf"}:
-        abort(404)
-    if artifact == "pdf" and run.get("pdf_status") != "ready":
-        flash("PDF renderer is unavailable. Install dependencies and regenerate.", "error")
-        return redirect(url_for("result", run_id=run_id))
-
-    file_name = run[artifact]
-    file_path = RUNS_DIR / run_id / "output" / file_name
+    file_path = RUNS_DIR / run_id / "output" / ARTIFACT_MAP[artifact]
     if not file_path.exists():
         abort(404)
-    return send_file(file_path, as_attachment=True, download_name=file_name)
+    return send_file(file_path, as_attachment=True, download_name=file_path.name)
 
 
 @app.get("/runs/<run_id>/<path:subpath>")
@@ -120,6 +125,34 @@ def serve_run_file(run_id: str, subpath: str):
     if not file_path.exists():
         abort(404)
     return send_file(file_path)
+
+
+def _latest_run_id_from_disk() -> str | None:
+    if not RUNS_DIR.exists():
+        return None
+    candidates = []
+    for entry in RUNS_DIR.iterdir():
+        output_dir = entry / "output"
+        if entry.is_dir() and output_dir.exists():
+            candidates.append((entry.stat().st_mtime, entry.name))
+    if not candidates:
+        return None
+    candidates.sort(reverse=True)
+    return candidates[0][1]
+
+
+def _build_run_payload_from_disk(run_id: str) -> dict[str, str] | None:
+    output_dir = RUNS_DIR / run_id / "output"
+    if not output_dir.exists():
+        return None
+    return {
+        "id": run_id,
+        "html": ARTIFACT_MAP["html"],
+        "markdown": ARTIFACT_MAP["markdown"],
+        "json": ARTIFACT_MAP["json"],
+        "pdf": ARTIFACT_MAP["pdf"],
+        "pdf_status": "ready" if (output_dir / ARTIFACT_MAP["pdf"]).exists() else "unavailable",
+    }
 
 
 if __name__ == "__main__":
