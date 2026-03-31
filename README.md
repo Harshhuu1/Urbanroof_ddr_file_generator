@@ -59,6 +59,15 @@ From the dashboard:
 - Click **Generate Report**
 - Download generated PDF/HTML/JSON/Markdown
 
+## Go Live (Render)
+
+1. Push this repo to GitHub.
+2. Open Render and create a new **Web Service** from your GitHub repo.
+3. Render will auto-detect `render.yaml`, or use:
+   - Build command: `pip install -r requirements.txt`
+   - Start command: `gunicorn app:app --timeout 300 --workers 1`
+4. Deploy and open the generated Render URL.
+
 ## What It Handles
 
 - Extracts impacted-area observations from the inspection report.
