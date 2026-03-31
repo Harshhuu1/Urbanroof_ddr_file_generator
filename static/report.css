@@ -1,0 +1,93 @@
+:root {
+  --bg: #f4f6f8;
+  --surface: #ffffff;
+  --ink: #1f2937;
+  --muted: #4b5563;
+  --line: #d8dee4;
+  --accent: #0f766e;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: linear-gradient(180deg, #eef7f6 0%, var(--bg) 35%);
+  color: var(--ink);
+  font-family: "Segoe UI", Tahoma, sans-serif;
+}
+
+.container {
+  width: min(1000px, 92%);
+  margin: 2rem auto 4rem;
+}
+
+.hero {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.hero h1 {
+  margin: 0;
+  font-size: 1.75rem;
+}
+
+.hero p {
+  margin: 0.5rem 0 0;
+  color: var(--muted);
+}
+
+section {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 1.1rem 1.25rem;
+  margin-bottom: 1rem;
+}
+
+h2 {
+  margin: 0 0 0.75rem;
+}
+
+.card {
+  border-top: 1px solid var(--line);
+  padding-top: 1rem;
+  margin-top: 1rem;
+}
+
+.img-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 0.75rem;
+}
+
+figure {
+  margin: 0;
+}
+
+img {
+  width: 100%;
+  height: auto;
+  border-radius: 8px;
+  border: 1px solid var(--line);
+}
+
+figcaption {
+  margin-top: 0.35rem;
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+
+.finding {
+  padding: 0.65rem 0;
+  border-top: 1px dashed var(--line);
+}
+
+.thermal-image {
+  max-width: 360px;
+}
+

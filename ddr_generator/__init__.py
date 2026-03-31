@@ -1,0 +1,2 @@
+"""DDR report generator package."""
+

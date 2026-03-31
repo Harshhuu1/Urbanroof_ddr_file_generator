@@ -1,0 +1,138 @@
+﻿<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{ report_title }}</title>
+  <link rel="stylesheet" href="static/report.css">
+</head>
+<body>
+  <main class="container">
+    <header class="hero">
+      <h1>{{ report_title }}</h1>
+      <p>Inspection Date: {{ report.report_header.inspection_date }}</p>
+      <p>Inspected By: {{ report.report_header.inspected_by }}</p>
+      <p>Property Type: {{ report.report_header.property_type }} | Floors: {{ report.report_header.floors }}</p>
+    </header>
+
+    <section>
+      <h2>1. Property Issue Summary</h2>
+      <ul>
+        {% for point in report.property_issue_summary %}
+        <li>{{ point }}</li>
+        {% endfor %}
+      </ul>
+    </section>
+
+    <section>
+      <h2>2. Area-wise Observations</h2>
+      {% if not report.area_observations %}
+      <p>Not Available</p>
+      {% endif %}
+      {% for area in report.area_observations %}
+      <article class="card">
+        <h3>{{ loop.index }}. {{ area.area }}</h3>
+        <p><strong>Negative Side Observation:</strong> {{ area.negative_observation }}</p>
+        <p><strong>Positive Side Observation:</strong> {{ area.positive_observation }}</p>
+        <p><strong>Evidence Note:</strong> Derived from extracted inspection text and linked thermal pages.</p>
+
+        <p><strong>Inspection Images:</strong></p>
+        {% if area.inspection_images %}
+        <div class="img-grid">
+          {% for image in area.inspection_images %}
+          <figure>
+            <img src="{{ image.relative_path }}" alt="{{ image.caption }}">
+            <figcaption>{{ image.caption }}</figcaption>
+          </figure>
+          {% endfor %}
+        </div>
+        {% else %}
+        <p>Image Not Available</p>
+        {% endif %}
+
+        <p><strong>Thermal Findings:</strong></p>
+        {% if area.thermal_findings %}
+          {% for finding in area.thermal_findings %}
+          <div class="finding">
+            <p>Page {{ finding.page_number }}: Hotspot {{ finding.hotspot_c }} C, Coldspot {{ finding.coldspot_c }} C, Image {{ finding.image_name }}, {{ finding.observation }}</p>
+            {% if finding.image %}
+            <figure class="thermal-image">
+              <img src="{{ finding.image.relative_path }}" alt="{{ finding.image.caption }}">
+              <figcaption>{{ finding.image.caption }}</figcaption>
+            </figure>
+            {% else %}
+            <p>Image Not Available</p>
+            {% endif %}
+          </div>
+          {% endfor %}
+        {% else %}
+        <p>Not Available</p>
+        {% endif %}
+      </article>
+      {% endfor %}
+    </section>
+
+    <section>
+      <h2>3. Probable Root Cause</h2>
+      <ul>
+        {% for row in report.probable_root_cause_section %}
+        <li>{{ row }}</li>
+        {% endfor %}
+      </ul>
+    </section>
+
+    <section>
+      <h2>4. Severity Assessment (with reasoning)</h2>
+      <ul>
+        {% for row in report.severity_assessment_section %}
+        <li>{{ row }}</li>
+        {% endfor %}
+      </ul>
+    </section>
+
+    <section>
+      <h2>5. Recommended Actions</h2>
+      <ul>
+        {% for row in report.recommended_actions_section %}
+        <li>{{ row }}</li>
+        {% endfor %}
+      </ul>
+    </section>
+
+    <section>
+      <h2>6. Additional Notes</h2>
+      <ul>
+        {% for note in report.additional_notes %}
+        <li>{{ note }}</li>
+        {% endfor %}
+      </ul>
+    </section>
+
+    <section>
+      <h2>7. Missing or Unclear Information</h2>
+      <ul>
+        {% if report.missing_or_unclear_information %}
+          {% for item in report.missing_or_unclear_information %}
+          <li>{{ item }}</li>
+          {% endfor %}
+        {% else %}
+        <li>Not Available</li>
+        {% endif %}
+      </ul>
+    </section>
+
+    <section>
+      <h2>Conflicts</h2>
+      <ul>
+        {% if report.conflicts %}
+          {% for conflict in report.conflicts %}
+          <li>{{ conflict }}</li>
+          {% endfor %}
+        {% else %}
+        <li>Not Available</li>
+        {% endif %}
+      </ul>
+    </section>
+  </main>
+</body>
+</html>

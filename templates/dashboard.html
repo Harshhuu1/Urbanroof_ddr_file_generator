@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>DDR Dashboard</title>
+  <link rel="stylesheet" href="/static/dashboard.css">
+</head>
+<body>
+  <main class="layout">
+    <section class="panel">
+      <h1>DDR Report Dashboard</h1>
+      <p>Upload both source PDFs and generate your client-ready DDR.</p>
+
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          {% for category, message in messages %}
+            <div class="alert {{ category }}">{{ message }}</div>
+          {% endfor %}
+        {% endif %}
+      {% endwith %}
+
+      <form method="post" action="/generate" enctype="multipart/form-data">
+        <label>Inspection PDF</label>
+        <input type="file" name="inspection_pdf" accept=".pdf" required>
+
+        <label>Thermal PDF</label>
+        <input type="file" name="thermal_pdf" accept=".pdf" required>
+
+        <label>Report Title</label>
+        <input type="text" name="report_title" value="Main DDR (Detailed Diagnostic Report)">
+
+        <button type="submit">Generate Report</button>
+      </form>
+    </section>
+
+    <section class="panel">
+      <h2>Latest Output</h2>
+      {% if latest_run %}
+      <p>Run ID: <code>{{ latest_run.id }}</code></p>
+      <div class="links">
+        <a href="/runs/{{ latest_run.id }}/main_ddr.html" target="_blank">Open HTML Preview</a>
+        <a href="/download/{{ latest_run.id }}/pdf">Download PDF</a>
+        <a href="/download/{{ latest_run.id }}/markdown">Download Markdown</a>
+        <a href="/download/{{ latest_run.id }}/json">Download JSON</a>
+      </div>
+      {% if latest_run.pdf_status != "ready" %}
+      <p class="hint">PDF unavailable. Install <code>reportlab</code> and generate again.</p>
+      {% endif %}
+      {% else %}
+      <p>No report generated yet.</p>
+      {% endif %}
+    </section>
+  </main>
+</body>
+</html>

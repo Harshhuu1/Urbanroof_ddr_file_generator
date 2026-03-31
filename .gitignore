@@ -1,0 +1,7 @@
+output/
+output_*/
+runs/
+__pycache__/
+*.pyc
+.pytest_cache/
+.venv/
